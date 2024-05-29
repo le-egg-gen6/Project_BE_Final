@@ -1,0 +1,78 @@
+#Spring Config
+spring:
+  #Application Config
+  application:
+    name: ProjectOOPFinal
+
+  #Servlet Config
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 50MB
+      max-file-size: 20MB
+
+  #Database Config
+  datasource:
+    url: jdbc:mysql://localhost:3306/oop_project
+    username: root
+    password: NgocLe*2004
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  #Hibernate
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  #Mail Config
+  mail:
+    protocol: smtp.gmail.com
+    port: 587
+    username: wibulord.forever.love.wibu@gmail.com
+    password: fdfj uuvg mayh odul
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+#Server Config
+server:
+  port: 6789
+
+socket-server:
+  port: 6790
+  host: localhost
+
+#Socket Server Config
+#socket:
+#  host: 0.0.0.0
+#  port: 6788
+
+#API Config
+api:
+  root-path: http://localhost/
+  prefix: /api
+  version: /v1
+
+#Security Properties
+jwt:
+  secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  duration: 86400000
+
+#Swagger Config
+swagger:
+  api:
+    name: API For Chat App
+    version: v1
+  contact:
+    email: nguyenle.workspace@gmail.com
+    name: Nguyen Le
+    url: some url
+  host:
+    address: localhost/${server.port}
+    path: /
