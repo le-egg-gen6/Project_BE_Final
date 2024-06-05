@@ -39,15 +39,15 @@ public class AuthServiceImpl implements AuthService {
         var user = userService.findByUsername(request.getUsername());
         if (user != null) {
             return AuthResponse.builder()
-                    .isError(ErrorConstant.USERNAME_DUPLICATE_CODE)
-                    .errorMessage(ErrorConstant.USERNAME_DUPLICATE)
+                    .success(false)
+                    .message(ErrorConstant.USERNAME_DUPLICATE)
                     .build();
         }
         user = userService.findByEmail(request.getEmail());
         if (user != null) {
             return AuthResponse.builder()
-                    .isError(ErrorConstant.EMAIL_DUPLICATE_CODE)
-                    .errorMessage(ErrorConstant.EMAIL_DUPLICATE)
+                    .success(false)
+                    .message(ErrorConstant.EMAIL_DUPLICATE)
                     .build();
         }
         var tmp_user = User.builder()
@@ -76,14 +76,14 @@ public class AuthServiceImpl implements AuthService {
         authTokenService.revokeAllUserToken(saved_user.getId());
         authTokenService.saveUserToken(saved_user, jwtToken);
         var response = AuthResponse.builder()
-                .isError(success ? 0 : ErrorConstant.EMAIL_SEND_FAILED_CODE)
+                .success(success)
                 .build();
         if (success) {
             response.setUserId(saved_user.getId());
             response.setIsVerified(1);
-            response.setToken(jwtToken);
+            response.setAccessToken(jwtToken);
         } else {
-            response.setErrorMessage(ErrorConstant.EMAIL_SEND_FAILED);
+            response.setMessage(ErrorConstant.EMAIL_SEND_FAILED);
         }
         return response;
     }
@@ -103,15 +103,15 @@ public class AuthServiceImpl implements AuthService {
             authTokenService.revokeAllUserToken(user.getId());
             authTokenService.saveUserToken(user, jwtToken);
             return AuthResponse.builder()
-                    .isError(0)
+                    .success(true)
                     .userId(user.getId())
                     .isVerified(user.getStatus() == Status.NOT_VERIFIED ? 1 : 0)
-                    .token(jwtToken)
+                    .accessToken(jwtToken)
                     .build();
         } else {
             return AuthResponse.builder()
-                    .isError(ErrorConstant.USERNAME_PASSWORD_WRONG_CODE)
-                    .errorMessage(ErrorConstant.USERNAME_PASSWORD_WRONG)
+                    .success(false)
+                    .message(ErrorConstant.USERNAME_PASSWORD_WRONG)
                     .build();
         }
     }

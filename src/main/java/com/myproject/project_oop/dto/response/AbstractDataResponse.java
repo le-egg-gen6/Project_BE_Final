@@ -16,5 +16,5 @@ public class AbstractDataResponse {
     private boolean success;
 
     @JsonIgnore
-    private boolean message;
+    private String message;
 }

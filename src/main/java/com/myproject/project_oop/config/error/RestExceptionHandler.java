@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
@@ -26,52 +25,52 @@ public class RestExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<BaseResponse> handleError404() {
-        return buildResponseEntity(new BaseResponse(HttpStatus.NOT_FOUND, "Requested resource does not exist", HttpStatus.NOT_FOUND.value()));
+    public ResponseEntity<BaseResponse<?>> handleError404() {
+        return buildResponseEntity("Requested resource does not exist!");
     }
 
     @ExceptionHandler(IOException.class)
-    public ResponseEntity<BaseResponse> handleIO(Exception e) {
+    public ResponseEntity<BaseResponse<?>> handleIO(Exception e) {
         LOGGER.error("Exception Caused By: ", e);
-        return buildResponseEntity(new BaseResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred in IO streams.", HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        return buildResponseEntity("An error occurred in IO streams!");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<BaseResponse> handleAccessDenied() {
-        return buildResponseEntity(new BaseResponse(HttpStatus.UNAUTHORIZED, "Access denied.", HttpStatus.UNAUTHORIZED.value()));
+    public ResponseEntity<BaseResponse<?>> handleAccessDenied() {
+        return buildResponseEntity("Access denied!");
     }
 
     @ExceptionHandler(InvalidArgumentException.class)
-    public ResponseEntity<BaseResponse> handleInvalidArgumentException(Exception e) {
-        return buildResponseEntity(new BaseResponse(HttpStatus.BAD_REQUEST, e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+    public ResponseEntity<BaseResponse<?>> handleInvalidArgumentException(Exception e) {
+        return buildResponseEntity(e.getMessage());
     }
 
     @ExceptionHandler(ResourceFetchException.class)
-    public ResponseEntity<BaseResponse> handleResourceFetchException(Exception e) {
+    public ResponseEntity<BaseResponse<?>> handleResourceFetchException(Exception e) {
         LOGGER.error("Exception Caused By: ", e);
-        return buildResponseEntity(new BaseResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        return buildResponseEntity(e.getMessage());
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<BaseResponse> handleResourceNotFoundException(Exception e) {
-        return buildResponseEntity(new BaseResponse(HttpStatus.NOT_FOUND, e.getMessage(), HttpStatus.NOT_FOUND.value()));
+    public ResponseEntity<BaseResponse<?>> handleResourceNotFoundException(Exception e) {
+        return buildResponseEntity(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<BaseResponse> handleValidationExceptions(MethodArgumentNotValidException e) {
+    public ResponseEntity<BaseResponse<?>> handleValidationExceptions(MethodArgumentNotValidException e) {
         StringBuilder stringBuilder = new StringBuilder();
         e.getBindingResult().getAllErrors().forEach(error -> stringBuilder.append(String.format("%s : %s ", ((FieldError) error).getField(), error.getDefaultMessage())));
-        return buildResponseEntity(new BaseResponse(HttpStatus.BAD_REQUEST, stringBuilder.toString(), HttpStatus.BAD_REQUEST.value()));
+        return buildResponseEntity(stringBuilder.toString());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<BaseResponse> handleError(Exception e) {
+    public ResponseEntity<BaseResponse<?>> handleError(Exception e) {
         LOGGER.error("Exception Caused By: ", e);
-        return buildResponseEntity(new BaseResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getClass().getName() + " " + e.getMessage(), 500));
+        return buildResponseEntity(e.getClass().getName() + " " + e.getMessage());
     }
 
-    private ResponseEntity<BaseResponse> buildResponseEntity(BaseResponse baseResponse) {
-        return new ResponseEntity<>(baseResponse, baseResponse.getStatus());
+    private ResponseEntity<BaseResponse<?>> buildResponseEntity(String message) {
+        return ResponseEntity.ok(BaseResponse.buildErrorResponse(message));
     }
 
 }
