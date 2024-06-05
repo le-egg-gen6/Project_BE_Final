@@ -3,6 +3,7 @@ package com.myproject.project_oop.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myproject.project_oop.config.security.jwt.JwtService;
 import com.myproject.project_oop.constant.MessageConstant;
+import com.myproject.project_oop.dto.response.BaseResponse;
 import com.myproject.project_oop.service.AuthTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,9 +36,9 @@ public class CustomLogoutHandler implements LogoutHandler {
         if (success) {
             SecurityContextHolder.clearContext();
             response.setContentType("application/json");
-            MessageResponse msg = MessageResponse.builder()
+            BaseResponse<?> msg = BaseResponse.builder()
                     .message(MessageConstant.LOGOUT_SUCCESS)
-                    .isError(0)
+                    .success(true)
                     .build();
             String json = objectMapper.writeValueAsString(msg);
             response.getWriter().println(json);

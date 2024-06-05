@@ -4,10 +4,11 @@ import com.myproject.project_oop.model.Conversation;
 import com.myproject.project_oop.repository.ConversationRepository;
 import com.myproject.project_oop.dto.response.message.MessageResponse;
 import com.myproject.project_oop.dto.response.conversation.ConversationDetailResponse;
+import com.myproject.project_oop.repository.MessageRepository;
 import com.myproject.project_oop.service.ConversationService;
-import com.myproject.project_oop.service.MessageService;
 import com.myproject.project_oop.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,9 +22,9 @@ public class ConversationServiceImpl implements ConversationService {
 
     private final ConversationRepository conversationRepository;
 
-    private final UserService userService;
+    private final MessageRepository messageRepository;
 
-    private final MessageService messageService;
+    private final UserService userService;
 
     @Override
     public Conversation getConversation(Integer id) {
@@ -40,10 +41,13 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public List<ConversationDetailResponse> getAllConversationDetails() {
         var user = userService.getUser();
+        if (user == null) {
+            throw new AccessDeniedException("Access Denied!");
+        }
         var listConversation = conversationRepository.getAllConversation(user.getId());
         return listConversation.stream().map(
             conversation -> {
-                var listMessage = messageService.getRawConversation(conversation.getId());
+                var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
                 var users = userService.findByConversationId(conversation.getId());
                 return ConversationDetailResponse.buildFromConversationAndMessage(conversation, listMessage, users);
             }
@@ -68,7 +72,9 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public List<MessageResponse> getConversationMessage(Integer conversationId) {
-        var rawResponse = messageService.getConversation(conversationId);
+        var rawResponse = messageRepository.findByConversationIdOrderByCreateAtAsc(conversationId).stream()
+                .map(MessageResponse::buildFromMessage)
+                .toList();
         List<MessageResponse> responses = new ArrayList<>();
         if (rawResponse.size() == 1) {
             responses.add(rawResponse.get(0));

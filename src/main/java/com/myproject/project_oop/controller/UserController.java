@@ -1,6 +1,7 @@
 package com.myproject.project_oop.controller;
 
 import com.myproject.project_oop.dto.request.user.UpdateUserRequest;
+import com.myproject.project_oop.dto.response.BaseResponse;
 import com.myproject.project_oop.dto.response.user.UserDetailsResponse;
 import com.myproject.project_oop.dto.response.user.UserResponse;
 import com.myproject.project_oop.service.FriendRequestService;
@@ -20,25 +21,27 @@ public class UserController {
 
     private final UserService userService;
 
-    private final FriendService friendService;
-
-    private final FriendRequestService friendRequestService;
-
     @GetMapping("/get-me")
-    public ResponseEntity<UserDetailsResponse> getUserDetails() {
-        return ResponseEntity.ok(userService.getUserDetails());
+    public ResponseEntity<BaseResponse<?>> getUserDetails() {
+        return ResponseEntity.ok(
+                BaseResponse.buildDataResponse(userService.getUserDetails())
+        );
     };
 
     @PostMapping("/update-me")
-    public ResponseEntity<UserDetailsResponse> updateRegisteredUser(
+    public ResponseEntity<BaseResponse<?>> updateRegisteredUser(
             @RequestBody UpdateUserRequest request
     ) {
-        return ResponseEntity.ok(userService.updateUserDetails(request));
+        return ResponseEntity.ok(
+                BaseResponse.buildDataResponse(updateRegisteredUser(request))
+        );
     }
 
     @GetMapping("/get-all-verified-user")
-    public ResponseEntity<List<UserResponse>> getAllVerifiedUser() {
-        return ResponseEntity.ok(userService.getAllVerifiedUser());
+    public ResponseEntity<BaseResponse<?>> getAllVerifiedUser() {
+        return ResponseEntity.ok(
+                BaseResponse.buildDataResponse(userService.getAllVerifiedUser())
+        );
     }
 
 }

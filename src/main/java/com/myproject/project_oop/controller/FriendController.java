@@ -1,5 +1,6 @@
 package com.myproject.project_oop.controller;
 
+import com.myproject.project_oop.dto.response.BaseResponse;
 import com.myproject.project_oop.dto.response.friend.FriendResponse;
 import com.myproject.project_oop.service.FriendService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("${api.prefix}" + "${api.version}" + "/friend")
 @RequiredArgsConstructor
@@ -20,8 +21,10 @@ public class FriendController {
     private final FriendService friendService;
 
     @GetMapping("/get-all-friends")
-    public ResponseEntity<List<FriendResponse>> getAllFriends() {
-        return ResponseEntity.ok(friendService.getAllFriends());
+    public ResponseEntity<BaseResponse<?>> getAllFriends() {
+        return ResponseEntity.ok(
+                BaseResponse.buildDataResponse(friendService.getAllFriends())
+        );
     }
 
 }

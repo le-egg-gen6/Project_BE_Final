@@ -1,6 +1,6 @@
 package com.myproject.project_oop.controller;
 
-import com.myproject.project_oop.dto.response.friend.FriendRequestResponse;
+import com.myproject.project_oop.dto.response.BaseResponse;
 import com.myproject.project_oop.service.FriendRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +20,10 @@ public class FriendRequestController {
     private final FriendRequestService friendRequestService;
 
     @GetMapping("/get-all-friend-request")
-    public ResponseEntity<List<FriendRequestResponse>> getALlFriendRequest() {
-        return ResponseEntity.ok(friendRequestService.getAllFriendRequests());
+    public ResponseEntity<BaseResponse<?>> getALlFriendRequest() {
+        return ResponseEntity.ok(
+                BaseResponse.buildDataResponse(friendRequestService.getAllFriendRequests())
+        );
     }
-
-
 
 }

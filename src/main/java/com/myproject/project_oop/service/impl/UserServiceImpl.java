@@ -1,10 +1,13 @@
 package com.myproject.project_oop.service.impl;
 
 import com.myproject.project_oop.model.File;
+import com.myproject.project_oop.model.FriendRequest;
 import com.myproject.project_oop.model.Participant;
 import com.myproject.project_oop.model.User;
 import com.myproject.project_oop.model.constant.FileType;
 import com.myproject.project_oop.model.constant.Status;
+import com.myproject.project_oop.repository.FriendRelationshipRepository;
+import com.myproject.project_oop.repository.FriendRequestRepository;
 import com.myproject.project_oop.repository.UserRepository;
 import com.myproject.project_oop.dto.request.user.UpdateUserRequest;
 import com.myproject.project_oop.dto.response.user.UserDetailsResponse;
@@ -24,6 +27,10 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    private final FriendRelationshipRepository friendRelationshipRepository;
+
+    private final FriendRequestRepository friendRequestRepository;
 
     private final FileService fileService;
 
@@ -82,8 +89,7 @@ public class UserServiceImpl implements UserService {
             user.setCity(request.getCity());
             user.setAddress(request.getAddress());
             File new_avatar = File.builder()
-                    .filename(request.getAvatarName())
-                    .url(request.getAvtUrl())
+                    .url(request.getAvatarUrl())
                     .type(FileType.AVATAR_IMAGE)
                     .build();
             var saved_new_avatar = fileService.save(new_avatar);
@@ -105,12 +111,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> getAllVerifiedUser() {
-//        var current_user = this.getUser();
+        var current_user = this.getUser();
+        if (current_user == null) {
+            throw new AccessDeniedException("Access Denied!");
+        }
         var listUser = userRepository.findAllByStatus(Status.VERIFIED);
-        return listUser.stream()
+        var listFriend = friendRelationshipRepository.getAllFriendId(current_user.getId());
+        var ret = listUser.stream()
+                .dropWhile(
+                        user -> Objects.equals(user.getId(), current_user.getId()) || listFriend.contains(user.getId())
+                )
                 .map(
                         UserResponse::buildFromUser
                 ).toList();
+        var listFriendRequest = friendRequestRepository.findAllByUserId(current_user.getId()).stream()
+                .map(FriendRequest::getUser).map(User::getId).collect(Collectors.toList());
+        for (var user : ret) {
+            if (listFriendRequest.contains(user.getUserId())) {
+                user.setSentFriendRequest(true);
+            } else {
+                user.setSentFriendRequest(false);
+            }
+        }
+        return ret;
     }
 
 

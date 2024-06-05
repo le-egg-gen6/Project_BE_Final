@@ -22,8 +22,8 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     @Override
     public List<FriendRequestResponse> getAllFriendRequests() {
         var user = userService.getUser();
-        if (user != null) {
-            throw new AccessDeniedException("Denied Access");
+        if (user == null) {
+            throw new AccessDeniedException("Access Denied!");
         }
         var lists = friendRequestRepository.findAllByUserId(user.getId());
         return lists.stream().map(FriendRequestResponse::buildFromFriendRequest).collect(Collectors.toList());
