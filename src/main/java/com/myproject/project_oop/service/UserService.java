@@ -1,9 +1,9 @@
 package com.myproject.project_oop.service;
 
 import com.myproject.project_oop.model.User;
-import com.myproject.project_oop.request.user.UpdateUserRequest;
-import com.myproject.project_oop.response.user.UserDetailsResponse;
-import com.myproject.project_oop.response.user.UserResponse;
+import com.myproject.project_oop.dto.request.user.UpdateUserRequest;
+import com.myproject.project_oop.dto.response.user.UserDetailsResponse;
+import com.myproject.project_oop.dto.response.user.UserResponse;
 
 import java.util.List;
 
@@ -28,5 +28,7 @@ public interface UserService {
     UserDetailsResponse getUserDetails();
 
     List<UserResponse> getAllVerifiedUser();
+
+    List<User> findByConversationId(Integer conversationId);
 
 }

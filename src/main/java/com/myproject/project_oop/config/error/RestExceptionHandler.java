@@ -3,7 +3,7 @@ package com.myproject.project_oop.config.error;
 import com.myproject.project_oop.config.error.exception.InvalidArgumentException;
 import com.myproject.project_oop.config.error.exception.ResourceFetchException;
 import com.myproject.project_oop.config.error.exception.ResourceNotFoundException;
-import com.myproject.project_oop.response.BaseResponse;
+import com.myproject.project_oop.dto.response.BaseResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;

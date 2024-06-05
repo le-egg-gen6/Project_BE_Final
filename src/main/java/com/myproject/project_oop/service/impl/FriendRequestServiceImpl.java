@@ -1,7 +1,7 @@
 package com.myproject.project_oop.service.impl;
 
 import com.myproject.project_oop.repository.FriendRequestRepository;
-import com.myproject.project_oop.response.friend.FriendRequestResponse;
+import com.myproject.project_oop.dto.response.friend.FriendRequestResponse;
 import com.myproject.project_oop.service.FriendRequestService;
 import com.myproject.project_oop.service.UserService;
 import lombok.RequiredArgsConstructor;

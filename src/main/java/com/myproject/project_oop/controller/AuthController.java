@@ -1,8 +1,8 @@
 package com.myproject.project_oop.controller;
 
-import com.myproject.project_oop.request.auth.LoginRequest;
-import com.myproject.project_oop.request.auth.RegisterRequest;
-import com.myproject.project_oop.response.auth.AuthResponse;
+import com.myproject.project_oop.dto.request.auth.LoginRequest;
+import com.myproject.project_oop.dto.request.auth.RegisterRequest;
+import com.myproject.project_oop.dto.response.auth.AuthResponse;
 import com.myproject.project_oop.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

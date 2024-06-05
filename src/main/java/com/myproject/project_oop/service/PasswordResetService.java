@@ -1,7 +1,7 @@
 package com.myproject.project_oop.service;
 
 import com.myproject.project_oop.model.User;
-import com.myproject.project_oop.request.password.ResetPasswordRequest;
+import com.myproject.project_oop.dto.request.password.ResetPasswordRequest;
 
 public interface PasswordResetService {
 

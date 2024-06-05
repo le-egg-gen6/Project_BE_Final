@@ -1,14 +1,15 @@
 package com.myproject.project_oop.service.impl;
 
 import com.myproject.project_oop.model.File;
+import com.myproject.project_oop.model.Participant;
 import com.myproject.project_oop.model.User;
+import com.myproject.project_oop.model.constant.FileType;
 import com.myproject.project_oop.model.constant.Status;
 import com.myproject.project_oop.repository.UserRepository;
-import com.myproject.project_oop.request.user.UpdateUserRequest;
-import com.myproject.project_oop.response.user.UserDetailsResponse;
-import com.myproject.project_oop.response.user.UserResponse;
-import com.myproject.project_oop.service.FileService;
-import com.myproject.project_oop.service.UserService;
+import com.myproject.project_oop.dto.request.user.UpdateUserRequest;
+import com.myproject.project_oop.dto.response.user.UserDetailsResponse;
+import com.myproject.project_oop.dto.response.user.UserResponse;
+import com.myproject.project_oop.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +26,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final FileService fileService;
+
+    private final ParticipantService participantService;
 
     @Override
     public User findByUsername(String username) {
@@ -80,8 +82,9 @@ public class UserServiceImpl implements UserService {
             user.setCity(request.getCity());
             user.setAddress(request.getAddress());
             File new_avatar = File.builder()
-                    .filename(request.getAvtName())
+                    .filename(request.getAvatarName())
                     .url(request.getAvtUrl())
+                    .type(FileType.AVATAR_IMAGE)
                     .build();
             var saved_new_avatar = fileService.save(new_avatar);
             user.setAvatar(saved_new_avatar);
@@ -102,14 +105,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> getAllVerifiedUser() {
-        var current_user = this.getUser();
+//        var current_user = this.getUser();
         var listUser = userRepository.findAllByStatus(Status.VERIFIED);
         return listUser.stream()
-                .dropWhile(
-                        user -> Objects.equals(user.getId(), current_user.getId())
-                )
                 .map(
                         UserResponse::buildFromUser
                 ).toList();
+    }
+
+
+    @Override
+    public List<User> findByConversationId(Integer conversationId) {
+        return participantService.findByConversationId(conversationId).stream()
+                .map(Participant::getUser)
+                .collect(Collectors.toList());
     }
 }

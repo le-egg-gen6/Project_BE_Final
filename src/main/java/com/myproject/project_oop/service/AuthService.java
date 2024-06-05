@@ -1,9 +1,8 @@
 package com.myproject.project_oop.service;
 
-import com.myproject.project_oop.request.auth.LoginRequest;
-import com.myproject.project_oop.request.auth.RegisterRequest;
-import com.myproject.project_oop.response.MessageResponse;
-import com.myproject.project_oop.response.auth.AuthResponse;
+import com.myproject.project_oop.dto.request.auth.LoginRequest;
+import com.myproject.project_oop.dto.request.auth.RegisterRequest;
+import com.myproject.project_oop.dto.response.auth.AuthResponse;
 
 public interface AuthService {
 

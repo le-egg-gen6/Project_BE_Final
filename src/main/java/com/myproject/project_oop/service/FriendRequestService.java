@@ -1,6 +1,6 @@
 package com.myproject.project_oop.service;
 
-import com.myproject.project_oop.response.friend.FriendRequestResponse;
+import com.myproject.project_oop.dto.response.friend.FriendRequestResponse;
 
 import java.util.List;
 

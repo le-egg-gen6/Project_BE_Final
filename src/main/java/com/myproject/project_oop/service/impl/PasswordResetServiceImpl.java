@@ -2,8 +2,7 @@ package com.myproject.project_oop.service.impl;
 
 import com.myproject.project_oop.model.PasswordResetToken;
 import com.myproject.project_oop.model.User;
-import com.myproject.project_oop.repository.PasswordResetTokenRepository;
-import com.myproject.project_oop.request.password.ResetPasswordRequest;
+import com.myproject.project_oop.dto.request.password.ResetPasswordRequest;
 import com.myproject.project_oop.service.PasswordResetService;
 import com.myproject.project_oop.service.PasswordResetTokenService;
 import com.myproject.project_oop.service.UserService;

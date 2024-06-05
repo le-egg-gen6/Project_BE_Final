@@ -5,13 +5,11 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
-import com.corundumstudio.socketio.listener.ConnectListener;
-import com.corundumstudio.socketio.listener.DisconnectListener;
-import com.myproject.project_oop.request.friend.FriendRequestRequest;
-import com.myproject.project_oop.request.message.MessageRequest;
-import com.myproject.project_oop.response.message.MessageResponse;
+import com.myproject.project_oop.dto.request.friend.FriendRequestRequest;
+import com.myproject.project_oop.dto.request.message.MessageRequest;
+import com.myproject.project_oop.dto.response.message.MessageResponse;
 import com.myproject.project_oop.service.MessageService;
-import com.myproject.project_oop.service.RoomService;
+import com.myproject.project_oop.service.ConversationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,13 +26,13 @@ public class SocketEventHandler {
 
     private final MessageService messageService;
 
-    private final RoomService roomService;
+    private final ConversationService roomService;
 
     @Autowired
     public SocketEventHandler(
             SocketIOServer socketIOServer,
             MessageService messageService,
-            RoomService roomService
+            ConversationService roomService
     ) {
         this.socketIOServer = socketIOServer;
         this.messageService = messageService;

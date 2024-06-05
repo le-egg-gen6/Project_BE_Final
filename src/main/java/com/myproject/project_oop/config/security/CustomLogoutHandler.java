@@ -3,7 +3,6 @@ package com.myproject.project_oop.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myproject.project_oop.config.security.jwt.JwtService;
 import com.myproject.project_oop.constant.MessageConstant;
-import com.myproject.project_oop.response.MessageResponse;
 import com.myproject.project_oop.service.AuthTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

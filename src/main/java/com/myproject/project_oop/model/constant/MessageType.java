@@ -4,8 +4,6 @@ public enum MessageType {
 
     TEXT,
 
-    URL,
-
-    FILE,
+    IMAGE,
 
 }

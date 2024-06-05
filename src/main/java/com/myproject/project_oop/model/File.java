@@ -13,8 +13,6 @@ import lombok.*;
 @Builder
 public class File extends BaseModel{
 
-    @Column(name = "filename")
-    private String filename;
 
     @Column(name = "url")
     private String url;

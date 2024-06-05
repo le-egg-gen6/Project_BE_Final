@@ -1,8 +1,10 @@
 package com.myproject.project_oop.controller;
 
-import com.myproject.project_oop.request.user.UpdateUserRequest;
-import com.myproject.project_oop.response.user.UserDetailsResponse;
-import com.myproject.project_oop.response.user.UserResponse;
+import com.myproject.project_oop.dto.request.user.UpdateUserRequest;
+import com.myproject.project_oop.dto.response.user.UserDetailsResponse;
+import com.myproject.project_oop.dto.response.user.UserResponse;
+import com.myproject.project_oop.service.FriendRequestService;
+import com.myproject.project_oop.service.FriendService;
 import com.myproject.project_oop.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,10 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+    private final FriendService friendService;
+
+    private final FriendRequestService friendRequestService;
 
     @GetMapping("/get-me")
     public ResponseEntity<UserDetailsResponse> getUserDetails() {

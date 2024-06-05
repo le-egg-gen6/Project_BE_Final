@@ -1,13 +1,16 @@
 package com.myproject.project_oop.service.impl;
 
-import com.myproject.project_oop.config.error.exception.ResourceNotFoundException;
 import com.myproject.project_oop.model.Message;
+import com.myproject.project_oop.repository.ConversationRepository;
 import com.myproject.project_oop.repository.MessageRepository;
-import com.myproject.project_oop.request.message.MessageRequest;
+import com.myproject.project_oop.dto.request.message.MessageRequest;
+import com.myproject.project_oop.dto.response.message.MessageResponse;
 import com.myproject.project_oop.service.MessageService;
-import com.myproject.project_oop.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +18,7 @@ public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
 
-    private final RoomService roomService;
+    private final ConversationRepository conversationRepository;
 
     @Override
     public Message save(Message message) {
@@ -24,10 +27,10 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Message saveNewMessage(MessageRequest request) {
-        var room = roomService.getRoom(request.getRoomId());
-        if (room != null) {
+        var conversation = conversationRepository.findById(request.getConversationId()).orElse(null);
+        if (conversation != null) {
             var newMessage = Message.builder()
-                    .room(room)
+                    .conversation(conversation)
                     .content(request.getContent())
                     .senderId(request.getSenderId())
                     .build();
@@ -35,5 +38,18 @@ public class MessageServiceImpl implements MessageService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<MessageResponse> getConversation(Integer conversationId) {
+        var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversationId);
+        return listMessage.stream()
+                .map(MessageResponse::buildFromMessage)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Message> getRawConversation(Integer conversationId) {
+        return messageRepository.findByConversationIdOrderByCreateAtAsc(conversationId);
     }
 }

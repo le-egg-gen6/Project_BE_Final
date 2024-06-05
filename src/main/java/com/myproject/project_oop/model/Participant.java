@@ -14,9 +14,11 @@ public class Participant extends BaseModel {
     @JoinColumn(name = "user_id")
     private User user;
 
-
     @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
+    @JoinColumn(name = "conversation_id")
+    private Conversation conversation;
+
+    @Column(name = "pinned")
+    private boolean pinned;
 
 }
