@@ -18,4 +18,9 @@ public class MessageConstant {
     public static final String PASSWORD_OTP_SUCCESS = "A email with your password reset token has been send to your email, please check!";
 
     public static final String LOGOUT_SUCCESS = "Logout successfully!";
+
+    public static final String FRIEND_REQUEST_SENT_SUCCESS = "Friend request sent successfully!";
+
+    public static final String FRIEND_REQUEST_ACCEPTED = "Friend request accepted!";
+
 }

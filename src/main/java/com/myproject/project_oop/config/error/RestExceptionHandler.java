@@ -4,8 +4,6 @@ import com.myproject.project_oop.config.error.exception.InvalidArgumentException
 import com.myproject.project_oop.config.error.exception.ResourceFetchException;
 import com.myproject.project_oop.config.error.exception.ResourceNotFoundException;
 import com.myproject.project_oop.dto.response.BaseResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +20,7 @@ import java.io.IOException;
 @RestControllerAdvice
 public class RestExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestExceptionHandler.class);
+//    private static final Logger LOGGER = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<BaseResponse<?>> handleError404() {
@@ -31,7 +29,6 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(IOException.class)
     public ResponseEntity<BaseResponse<?>> handleIO(Exception e) {
-        LOGGER.error("Exception Caused By: ", e);
         return buildResponseEntity("An error occurred in IO streams!");
     }
 
@@ -47,7 +44,6 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(ResourceFetchException.class)
     public ResponseEntity<BaseResponse<?>> handleResourceFetchException(Exception e) {
-        LOGGER.error("Exception Caused By: ", e);
         return buildResponseEntity(e.getMessage());
     }
 
@@ -65,7 +61,6 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<?>> handleError(Exception e) {
-        LOGGER.error("Exception Caused By: ", e);
         return buildResponseEntity(e.getClass().getName() + " " + e.getMessage());
     }
 
