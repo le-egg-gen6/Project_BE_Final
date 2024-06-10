@@ -1,5 +1,6 @@
 package com.myproject.project_oop.service.impl;
 
+import com.myproject.project_oop.config.error.exception.InvalidArgumentException;
 import com.myproject.project_oop.dto.request.conversation.CreateConversationRequest;
 import com.myproject.project_oop.model.Conversation;
 import com.myproject.project_oop.model.Participant;
@@ -130,18 +131,18 @@ public class ConversationServiceImpl implements ConversationService {
         if (currentUser == null) {
             throw new AccessDeniedException("Access denied!");
         }
-        if (!request.getGroupMemberId().contains(currentUser.getId())) {
-            return ConversationDetailResponse.builder()
-                    .success(false)
-                    .message("You cannot create group without you!")
-                    .build();
+        var listMemberId = request.getMembers().stream().map(
+                s -> Integer.valueOf(s.substring(0, s.indexOf(':')))
+        ).toList();
+        if (!listMemberId.contains(currentUser.getId())) {
+            throw new InvalidArgumentException("Your group must contain you!");
         }
         Conversation conversation = Conversation.builder()
                 .name(request.getName())
                 .type(request.getType().equals("DIRECT") ? ConversationType.DIRECT : ConversationType.GROUP)
                 .build();
         var saved_conversation = conversationRepository.save(conversation);
-        var listUsers = request.getGroupMemberId().stream()
+        var listUsers = listMemberId.stream()
                 .map(
                         userService::findById
                 ).collect(Collectors.toList());

@@ -16,7 +16,7 @@ public class CreateConversationRequest {
     @JsonProperty("type")
     private String type;
 
-    @JsonProperty("groupMemberId")
-    private List<Integer> groupMemberId;
+    @JsonProperty("members")
+    private List<String> members;
 
 }
