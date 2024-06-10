@@ -62,4 +62,27 @@ public class ConversationDetailResponse extends AbstractDataResponse {
                 .build();
     }
 
+    public static ConversationDetailResponse buildFromConversationAndMessage(
+            Conversation conversation,
+            String name,
+            List<Message> messageList,
+            List<User> users,
+            boolean pinned
+    ) {
+        return ConversationDetailResponse.builder()
+                .conversationId(conversation.getId())
+//                .avatarUrl(conversation.)
+                .name(name)
+                .lastArrivedMessage(
+                        messageList.isEmpty() ? null : MessageResponse.buildFromMessage(messageList.get(messageList.size() - 1))
+                )
+                .participants(
+                        users.stream().map(
+                                UserResponse::buildFromUser
+                        ).toList()
+                )
+                .pinned(pinned)
+                .build();
+    }
+
 }

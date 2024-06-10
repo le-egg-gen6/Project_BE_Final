@@ -11,7 +11,7 @@ import java.util.List;
 public interface FriendRelationshipRepository extends JpaRepository<FriendRelationship, Integer> {
 
     @Query(
-            value = "select fr.id from FriendRelationship fr where fr.user.id = :id"
+            value = "select fr.friend from FriendRelationship fr where fr.user.id = :id"
     )
     List<Integer> getAllFriendId(Integer id);
 

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,7 +78,17 @@ public class ConversationServiceImpl implements ConversationService {
                         conversation -> {
                             var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
                             var users = userService.findByConversationId(conversation.getId());
-                            return ConversationDetailResponse.buildFromConversationAndMessage(conversation, listMessage, users, false);
+                            if (type == ConversationType.GROUP) {
+                                return ConversationDetailResponse.buildFromConversationAndMessage(conversation, listMessage, users, false);
+                            } else {
+                                String name = "";
+                                if (Objects.equals(users.get(0).getId(), user.getId())) {
+                                    name = users.get(1).getFullName();
+                                } else {
+                                    name = users.get(0).getFullName();
+                                }
+                                return ConversationDetailResponse.buildFromConversationAndMessage(conversation, name, listMessage, users, false);
+                            }
                         }
                 ).toList()
         );
@@ -132,7 +143,13 @@ public class ConversationServiceImpl implements ConversationService {
             throw new AccessDeniedException("Access denied!");
         }
         var listMemberId = request.getMembers().stream().map(
-                s -> Integer.valueOf(s.substring(0, s.indexOf(':')))
+                s -> {
+                    if (request.getType().equals("DIRECT")) {
+                        return Integer.valueOf(s);
+                    } else {
+                        return Integer.valueOf(s.substring(0, s.indexOf(':')));
+                    }
+                }
         ).toList();
         if (!listMemberId.contains(currentUser.getId())) {
             throw new InvalidArgumentException("Your group must contain you!");
@@ -160,6 +177,16 @@ public class ConversationServiceImpl implements ConversationService {
         );
         var final_conversation = conversationRepository.save(saved_conversation);
         var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
-        return ConversationDetailResponse.buildFromConversationAndMessage(final_conversation, listMessage, listUsers, false);
+        if (final_conversation.getType() == ConversationType.GROUP) {
+            return ConversationDetailResponse.buildFromConversationAndMessage(final_conversation, listMessage, listUsers, false);
+        } else {
+            String name = "";
+            if (Objects.equals(listUsers.get(0).getId(), currentUser.getId())) {
+                name = listUsers.get(1).getFullName();
+            } else {
+                name = listUsers.get(0).getFullName();
+            }
+            return ConversationDetailResponse.buildFromConversationAndMessage(final_conversation, name, listMessage, listUsers, false);
+        }
     }
 }
