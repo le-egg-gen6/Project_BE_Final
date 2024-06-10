@@ -5,7 +5,6 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
-import com.myproject.project_oop.dto.request.friend.FriendRequestRequest;
 import com.myproject.project_oop.dto.request.message.MessageRequest;
 import com.myproject.project_oop.dto.response.message.MessageResponse;
 import com.myproject.project_oop.service.MessageService;
@@ -45,13 +44,15 @@ public class SocketEventHandler {
     public void onConnected(SocketIOClient client) {
         var userId = getUserIdFromHandshakeData(client);
         System.out.println("User " + userId + " connected");
+        System.out.println(client);
         clients.put(userId, client);
+        System.out.println("Number of client " + clients.size());
     }
 
     @OnDisconnect
     public void onDisconnected(SocketIOClient client) {
         var userId = getUserIdFromHandshakeData(client);
-        System.out.println("User " + userId + "disconnected");
+        System.out.println("User " + userId + " disconnected");
         clients.remove(userId);
     }
 
@@ -63,7 +64,7 @@ public class SocketEventHandler {
     public void onMessageReceived(SocketIOClient client, MessageRequest payload) {
         var responsePayload = saveAndConvertMessage(payload);
         var userId = getUserIdFromHandshakeData(client);
-        if (responsePayload != null && userId == payload.getSenderId()) {
+        if (responsePayload != null && userId.equals(payload.getSenderId())) {
             List<Integer> participants = roomService.getParticipantsId(userId);
             for (Integer id : participants) {
                 var receiverClient = clients.get(id);
@@ -82,8 +83,8 @@ public class SocketEventHandler {
         return null;
     }
 
-    @OnEvent("send_friend_request")
-    public void onFriendRequestReceived(SocketIOClient client, FriendRequestRequest payload) {
-
-    }
+//    @OnEvent("send_friend_request")
+//    public void onFriendRequestReceived(SocketIOClient client, FriendRequestRequest payload) {
+//
+//    }
 }

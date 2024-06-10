@@ -16,6 +16,8 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, In
     @Query(
             value = "select f_r from FriendRequest f_r where f_r.receiverId = :id"
     )
-    List<FriendRequest> findAllByUserId(Integer id);
+    List<FriendRequest> findAllFriendRequestByReceiverId(Integer id);
+
+    Optional<FriendRequest> findByUserIdAndReceiverId(Integer userId, Integer receiverId);
 
 }

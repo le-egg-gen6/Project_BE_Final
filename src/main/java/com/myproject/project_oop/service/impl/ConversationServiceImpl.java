@@ -1,10 +1,14 @@
 package com.myproject.project_oop.service.impl;
 
+import com.myproject.project_oop.dto.request.conversation.CreateConversationRequest;
 import com.myproject.project_oop.model.Conversation;
+import com.myproject.project_oop.model.Participant;
+import com.myproject.project_oop.model.constant.ConversationType;
 import com.myproject.project_oop.repository.ConversationRepository;
 import com.myproject.project_oop.dto.response.message.MessageResponse;
 import com.myproject.project_oop.dto.response.conversation.ConversationDetailResponse;
 import com.myproject.project_oop.repository.MessageRepository;
+import com.myproject.project_oop.repository.ParticipantRepository;
 import com.myproject.project_oop.service.ConversationService;
 import com.myproject.project_oop.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,8 @@ import java.util.stream.Collectors;
 public class ConversationServiceImpl implements ConversationService {
 
     private final ConversationRepository conversationRepository;
+
+    private final ParticipantRepository participantRepository;
 
     private final MessageRepository messageRepository;
 
@@ -39,19 +45,42 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public List<ConversationDetailResponse> getAllConversationDetails() {
+    public List<ConversationDetailResponse> getAllDirectConversationDetails() {
+        return getAllConversationDetails(ConversationType.DIRECT);
+    }
+
+    @Override
+    public List<ConversationDetailResponse> getAllGroupConversationDetails() {
+        return getAllConversationDetails(ConversationType.GROUP);
+    }
+
+
+    private List<ConversationDetailResponse> getAllConversationDetails(ConversationType type) {
         var user = userService.getUser();
         if (user == null) {
             throw new AccessDeniedException("Access Denied!");
         }
-        var listConversation = conversationRepository.getAllConversation(user.getId());
-        return listConversation.stream().map(
-            conversation -> {
-                var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
-                var users = userService.findByConversationId(conversation.getId());
-                return ConversationDetailResponse.buildFromConversationAndMessage(conversation, listMessage, users);
-            }
-        ).collect(Collectors.toList());
+        var listPinnedConversation = conversationRepository.getAllConversation(user.getId(), type, true);
+        var listUnpinnedConversation = conversationRepository.getAllConversation(user.getId(), type, false);
+        var ret = new ArrayList<>(
+                listPinnedConversation.stream().map(
+                    conversation -> {
+                        var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
+                        var users = userService.findByConversationId(conversation.getId());
+                        return ConversationDetailResponse.buildFromConversationAndMessage(conversation, listMessage, users, true);
+                    }
+                ).toList()
+        );
+        ret.addAll(
+                listUnpinnedConversation.stream().map(
+                        conversation -> {
+                            var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
+                            var users = userService.findByConversationId(conversation.getId());
+                            return ConversationDetailResponse.buildFromConversationAndMessage(conversation, listMessage, users, false);
+                        }
+                ).toList()
+        );
+        return ret;
     }
 
     private boolean checkDateDiff(Date pre, Date after) {
@@ -93,5 +122,43 @@ public class ConversationServiceImpl implements ConversationService {
             responses.add(after);
         }
         return responses;
+    }
+
+    @Override
+    public ConversationDetailResponse createConversation(CreateConversationRequest request) {
+        var currentUser = userService.getUser();
+        if (currentUser == null) {
+            throw new AccessDeniedException("Access denied!");
+        }
+        if (!request.getGroupMemberId().contains(currentUser.getId())) {
+            return ConversationDetailResponse.builder()
+                    .success(false)
+                    .message("You cannot create group without you!")
+                    .build();
+        }
+        Conversation conversation = Conversation.builder()
+                .name(request.getName())
+                .type(request.getType().equals("DIRECT") ? ConversationType.DIRECT : ConversationType.GROUP)
+                .build();
+        var saved_conversation = conversationRepository.save(conversation);
+        var listUsers = request.getGroupMemberId().stream()
+                .map(
+                        userService::findById
+                ).collect(Collectors.toList());
+        saved_conversation.setParticipants(
+               listUsers.stream().map(
+                       user -> {
+                           var participant = Participant.builder()
+                                   .conversation(saved_conversation)
+                                   .user(user)
+                                   .pinned(false)
+                                   .build();
+                           return participantRepository.save(participant);
+                       }
+               ).collect(Collectors.toSet())
+        );
+        var final_conversation = conversationRepository.save(saved_conversation);
+        var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
+        return ConversationDetailResponse.buildFromConversationAndMessage(final_conversation, listMessage, listUsers, false);
     }
 }

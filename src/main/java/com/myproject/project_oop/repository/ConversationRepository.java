@@ -2,6 +2,7 @@ package com.myproject.project_oop.repository;
 
 import com.myproject.project_oop.model.Conversation;
 import com.myproject.project_oop.model.Participant;
+import com.myproject.project_oop.model.constant.ConversationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,7 +21,10 @@ public interface ConversationRepository extends JpaRepository<Conversation, Inte
     List<Participant> getParticipantsByRoomId(Integer id);
 
     @Query(
-            value = "select c from Participant p join Conversation c on p.conversation.id = c.id where p.user.id = :id"
+            value = "select c from Participant p join Conversation c on p.conversation.id = c.id where c.type = :type and p.user.id = :id and p.pinned = :pinned "
     )
-    List<Conversation> getAllConversation(Integer id);
+    List<Conversation> getAllConversation(Integer id, ConversationType type, boolean pinned);
+
+
+
 }

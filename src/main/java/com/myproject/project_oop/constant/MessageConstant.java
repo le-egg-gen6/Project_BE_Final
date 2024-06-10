@@ -23,4 +23,5 @@ public class MessageConstant {
 
     public static final String FRIEND_REQUEST_ACCEPTED = "Friend request accepted!";
 
+    public static final String GROUP_CREATED_SUCCESSFULLY = "Group created successfully!";
 }

@@ -18,7 +18,7 @@ public class FriendRequestController {
     private final FriendRequestService friendRequestService;
 
     @GetMapping("/get-all-friend-request")
-    public ResponseEntity<BaseResponse<?>> getALlFriendRequest() {
+    public ResponseEntity<BaseResponse<?>> getAllFriendRequest() {
         return ResponseEntity.ok(
                 BaseResponse.buildDataResponse(friendRequestService.getAllFriendRequests())
         );
@@ -28,6 +28,7 @@ public class FriendRequestController {
     public ResponseEntity<BaseResponse<?>> sendFriendRequest(
             @RequestBody SendFriendRequest request
     ) {
+        friendRequestService.sendFriendRequest(request);
         return ResponseEntity.ok(
                 BaseResponse.buildMessageResponse(MessageConstant.FRIEND_REQUEST_SENT_SUCCESS)
         );
@@ -37,6 +38,7 @@ public class FriendRequestController {
     public ResponseEntity<BaseResponse<?>> acceptFriendRequest(
             @RequestBody AcceptFriendRequest request
     ) {
+        friendRequestService.acceptFriendRequest(request);
         return ResponseEntity.ok(
                 BaseResponse.buildMessageResponse(MessageConstant.FRIEND_REQUEST_ACCEPTED)
         );

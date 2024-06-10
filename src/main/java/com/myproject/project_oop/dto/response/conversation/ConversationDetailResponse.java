@@ -20,8 +20,11 @@ import java.util.List;
 @SuperBuilder
 public class ConversationDetailResponse extends AbstractDataResponse {
 
-    @JsonProperty("userId")
+    @JsonProperty("conversationId")
     private Integer conversationId;
+
+    @JsonProperty("name")
+    private String name;
 
     @JsonProperty("avatarUrl")
     private String avatarUrl;
@@ -32,18 +35,30 @@ public class ConversationDetailResponse extends AbstractDataResponse {
     @JsonProperty("participants")
     private List<UserResponse> participants;
 
+    @JsonProperty("pinned")
+    private boolean pinned;
+
     public static ConversationDetailResponse buildFromConversationAndMessage(
             Conversation conversation,
             List<Message> messageList,
-            List<User> users
+            List<User> users,
+            boolean pinned
     ) {
         return ConversationDetailResponse.builder()
                 .conversationId(conversation.getId())
 //                .avatarUrl(conversation.)
+                .name(
+                        conversation.getName() != null ? conversation.getName() : null
+                )
                 .lastArrivedMessage(
                         messageList.isEmpty() ? null : MessageResponse.buildFromMessage(messageList.get(messageList.size() - 1))
                 )
-                .participants(users.stream().map(UserResponse::buildFromUser).toList())
+                .participants(
+                        users.stream().map(
+                                UserResponse::buildFromUser
+                        ).toList()
+                )
+                .pinned(pinned)
                 .build();
     }
 

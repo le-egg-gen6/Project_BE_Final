@@ -1,5 +1,6 @@
 package com.myproject.project_oop.service;
 
+import com.myproject.project_oop.dto.request.conversation.CreateConversationRequest;
 import com.myproject.project_oop.model.Conversation;
 import com.myproject.project_oop.dto.response.conversation.ConversationDetailResponse;
 import com.myproject.project_oop.dto.response.message.MessageResponse;
@@ -12,8 +13,12 @@ public interface ConversationService {
 
     List<Integer> getParticipantsId(Integer roomId);
 
-    List<ConversationDetailResponse> getAllConversationDetails();
+    List<ConversationDetailResponse> getAllDirectConversationDetails();
+
+    List<ConversationDetailResponse> getAllGroupConversationDetails();
 
     List<MessageResponse> getConversationMessage(Integer conversationId);
+
+    ConversationDetailResponse createConversation(CreateConversationRequest request);
 
 }

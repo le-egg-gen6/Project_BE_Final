@@ -35,7 +35,7 @@ public class FriendRequestServiceImpl implements FriendRequestService {
         if (user == null) {
             throw new AccessDeniedException("Access Denied!");
         }
-        var lists = friendRequestRepository.findAllByUserId(user.getId());
+        var lists = friendRequestRepository.findAllFriendRequestByReceiverId(user.getId());
         return lists.stream().map(FriendRequestResponse::buildFromFriendRequest).collect(Collectors.toList());
     }
 
@@ -47,6 +47,10 @@ public class FriendRequestServiceImpl implements FriendRequestService {
                 || !Objects.equals(currentUser.getId(), request.getSenderId())
         ) {
             throw new AccessDeniedException("Access denied!");
+        }
+        var savedFriendRequest = friendRequestRepository.findByUserIdAndReceiverId(currentUser.getId(), request.getReceiverId());
+        if (savedFriendRequest.isPresent()) {
+            throw new InvalidArgumentException("You have sent friend request!");
         }
         var friendRequest = FriendRequest.builder()
                 .user(currentUser)
@@ -80,5 +84,6 @@ public class FriendRequestServiceImpl implements FriendRequestService {
                 .build();
         friendRelationshipRepository.save(friendRelationship_1);
         friendRelationshipRepository.save(friendRelationship_2);
+        friendRequestRepository.delete(savedFriendRequest);
     }
 }

@@ -118,14 +118,15 @@ public class UserServiceImpl implements UserService {
         var listUser = userRepository.findAllByStatus(Status.VERIFIED);
         var listFriend = friendRelationshipRepository.getAllFriendId(current_user.getId());
         var ret = listUser.stream()
-                .dropWhile(
-                        user -> Objects.equals(user.getId(), current_user.getId()) || listFriend.contains(user.getId())
+                .filter(
+                        user -> !Objects.equals(user.getId(), current_user.getId())
+                                && !listFriend.contains(user.getId())
                 )
                 .map(
                         UserResponse::buildFromUser
                 ).toList();
-        var listFriendRequest = friendRequestRepository.findAllByUserId(current_user.getId()).stream()
-                .map(FriendRequest::getUser).map(User::getId).collect(Collectors.toList());
+        var listFriendRequest = friendRequestRepository.findAllFriendRequestByReceiverId(current_user.getId()).stream()
+                .map(FriendRequest::getUser).map(User::getId).toList();
         for (var user : ret) {
             if (listFriendRequest.contains(user.getUserId())) {
                 user.setSentFriendRequest(true);
