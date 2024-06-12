@@ -2,9 +2,9 @@ package com.myproject.project_oop.controller.socket;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.annotation.OnConnect;
-import com.corundumstudio.socketio.annotation.OnDisconnect;
-import com.corundumstudio.socketio.annotation.OnEvent;
+import com.corundumstudio.socketio.listener.ConnectListener;
+import com.corundumstudio.socketio.listener.DataListener;
+import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.myproject.project_oop.dto.request.message.MessageRequest;
 import com.myproject.project_oop.dto.response.message.MessageResponse;
 import com.myproject.project_oop.service.MessageService;
@@ -12,14 +12,14 @@ import com.myproject.project_oop.service.ConversationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class SocketEventHandler {
 
-    private static final Map<Integer, SocketIOClient> clients = new ConcurrentHashMap<>();
+    private static final Map<Integer, SocketIOClient> clients = new HashMap<>();
 
     private final SocketIOServer socketIOServer;
 
@@ -36,43 +36,51 @@ public class SocketEventHandler {
         this.socketIOServer = socketIOServer;
         this.messageService = messageService;
         this.roomService = roomService;
-        socketIOServer.addListeners(this);
+        socketIOServer.addConnectListener(this.onConnected());
+        socketIOServer.addDisconnectListener(this.onDisconnected());
+        socketIOServer.addEventListener("send_message", MessageRequest.class, this.onMessageReceived());
         socketIOServer.start();
     }
 
-    @OnConnect
-    public void onConnected(SocketIOClient client) {
-        var userId = getUserIdFromHandshakeData(client);
-        System.out.println("User " + userId + " connected");
-        System.out.println(client);
-        clients.put(userId, client);
-        System.out.println("Number of client " + clients.size());
+    private ConnectListener onConnected() {
+        return (client) -> {
+            var userId = getUserIdFromHandshakeData(client);
+            System.out.println("User " + userId + " connected");
+            System.out.println(client);
+            clients.put(userId, client);
+            client.joinRoom("global");
+            System.out.println("Number of client " + clients.size());
+        };
+
     }
 
-    @OnDisconnect
-    public void onDisconnected(SocketIOClient client) {
-        var userId = getUserIdFromHandshakeData(client);
-        System.out.println("User " + userId + " disconnected");
-        clients.remove(userId);
+    private DisconnectListener onDisconnected() {
+        return (client) -> {
+            var userId = getUserIdFromHandshakeData(client);
+            System.out.println("User " + userId + " disconnected");
+            clients.remove(userId);
+        };
+    }
+
+    public DataListener<MessageRequest> onMessageReceived() {
+        return (client, data, ackSender) -> {
+            var responsePayload = saveAndConvertMessage(data);
+            var userId = getUserIdFromHandshakeData(client);
+            if (responsePayload != null && userId.equals(data.getSenderId())) {
+                System.out.println(responsePayload.getContent());
+                List<Integer> participants = roomService.getParticipantsId(responsePayload.getConversationId());
+                for (Integer id : participants) {
+                    var receiverClient = clients.get(id);
+                    if (receiverClient != null) {
+                        receiverClient.sendEvent("new_message", responsePayload);
+                    }
+                }
+            }
+        };
     }
 
     private Integer getUserIdFromHandshakeData(SocketIOClient client) {
         return Integer.parseInt(client.getHandshakeData().getSingleUrlParam("userId"));
-    }
-
-    @OnEvent("send_message")
-    public void onMessageReceived(SocketIOClient client, MessageRequest payload) {
-        var responsePayload = saveAndConvertMessage(payload);
-        var userId = getUserIdFromHandshakeData(client);
-        if (responsePayload != null && userId.equals(payload.getSenderId())) {
-            List<Integer> participants = roomService.getParticipantsId(userId);
-            for (Integer id : participants) {
-                var receiverClient = clients.get(id);
-                if (receiverClient != null) {
-                    receiverClient.sendEvent("new_message", responsePayload);
-                }
-            }
-        }
     }
 
     private MessageResponse saveAndConvertMessage(MessageRequest payload) {

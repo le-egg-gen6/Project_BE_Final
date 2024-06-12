@@ -67,7 +67,7 @@ public class ConversationServiceImpl implements ConversationService {
         var ret = new ArrayList<>(
                 listPinnedConversation.stream().map(
                     conversation -> {
-                        var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
+                        var listMessage = messageRepository.findByConversationIdOrderById(conversation.getId());
                         var users = userService.findByConversationId(conversation.getId());
                         return ConversationDetailResponse.buildFromConversationAndMessage(conversation, listMessage, users, true);
                     }
@@ -76,7 +76,7 @@ public class ConversationServiceImpl implements ConversationService {
         ret.addAll(
                 listUnpinnedConversation.stream().map(
                         conversation -> {
-                            var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
+                            var listMessage = messageRepository.findByConversationIdOrderById(conversation.getId());
                             var users = userService.findByConversationId(conversation.getId());
                             if (type == ConversationType.GROUP) {
                                 return ConversationDetailResponse.buildFromConversationAndMessage(conversation, listMessage, users, false);
@@ -113,25 +113,26 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public List<MessageResponse> getConversationMessage(Integer conversationId) {
-        var rawResponse = messageRepository.findByConversationIdOrderByCreateAtAsc(conversationId).stream()
+        var rawResponse = messageRepository.findByConversationIdOrderById(conversationId).stream()
                 .map(MessageResponse::buildFromMessage)
                 .toList();
         List<MessageResponse> responses = new ArrayList<>();
         if (rawResponse.size() == 1) {
             responses.add(rawResponse.get(0));
-        }
-        for (int i = 1; i < rawResponse.size(); ++i) {
-            var pre = rawResponse.get(i - 1);
-            var after = rawResponse.get(i);
-            if (checkDateDiff(pre.getCreatedAt(), after.getCreatedAt())) {
-                responses.add(
-                        MessageResponse.builder()
-                                .type("divider")
-                                .content(convertDateToString(after.getCreatedAt()))
-                                .build()
-                );
+        } else if (rawResponse.size() > 1) {
+            for (int i = 1; i < rawResponse.size(); ++i) {
+                var pre = rawResponse.get(i - 1);
+                var after = rawResponse.get(i);
+                if (checkDateDiff(pre.getCreatedAt(), after.getCreatedAt())) {
+                    responses.add(
+                            MessageResponse.builder()
+                                    .type("divider")
+                                    .content(convertDateToString(after.getCreatedAt()))
+                                    .build()
+                    );
+                }
+                responses.add(after);
             }
-            responses.add(after);
         }
         return responses;
     }
@@ -176,7 +177,7 @@ public class ConversationServiceImpl implements ConversationService {
                ).collect(Collectors.toSet())
         );
         var final_conversation = conversationRepository.save(saved_conversation);
-        var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversation.getId());
+        var listMessage = messageRepository.findByConversationIdOrderById(conversation.getId());
         if (final_conversation.getType() == ConversationType.GROUP) {
             return ConversationDetailResponse.buildFromConversationAndMessage(final_conversation, listMessage, listUsers, false);
         } else {

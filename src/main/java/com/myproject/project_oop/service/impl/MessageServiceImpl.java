@@ -1,6 +1,7 @@
 package com.myproject.project_oop.service.impl;
 
 import com.myproject.project_oop.model.Message;
+import com.myproject.project_oop.model.constant.MessageType;
 import com.myproject.project_oop.repository.ConversationRepository;
 import com.myproject.project_oop.repository.MessageRepository;
 import com.myproject.project_oop.dto.request.message.MessageRequest;
@@ -32,6 +33,7 @@ public class MessageServiceImpl implements MessageService {
             var newMessage = Message.builder()
                     .conversation(conversation)
                     .content(request.getContent())
+                    .type(request.getType().equals("TEXT") ? MessageType.TEXT : MessageType.IMAGE)
                     .senderId(request.getSenderId())
                     .build();
             return messageRepository.save(newMessage);
@@ -42,7 +44,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageResponse> getConversation(Integer conversationId) {
-        var listMessage = messageRepository.findByConversationIdOrderByCreateAtAsc(conversationId);
+        var listMessage = messageRepository.findByConversationIdOrderById(conversationId);
         return listMessage.stream()
                 .map(MessageResponse::buildFromMessage)
                 .collect(Collectors.toList());
@@ -50,6 +52,6 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> getRawConversation(Integer conversationId) {
-        return messageRepository.findByConversationIdOrderByCreateAtAsc(conversationId);
+        return messageRepository.findByConversationIdOrderById(conversationId);
     }
 }
