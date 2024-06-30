@@ -1,8 +1,6 @@
 package com.myproject.project_oop.dto.response.friend;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.myproject.project_oop.dto.response.AbstractDataResponse;
-import com.myproject.project_oop.model.File;
 import com.myproject.project_oop.model.User;
 import lombok.Data;
 import lombok.Getter;
@@ -32,14 +30,12 @@ public class FriendResponse {
 
     public static FriendResponse buildFromUser(User user) {
 
-        File avatar = user.getAvatar();
-
         return FriendResponse.builder()
                 .friendId(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
-                .avatarUrl(avatar == null ? "" : avatar.getUrl())
+                .avatarUrl(user.getAvatarFileName())
                 .build();
     }
 

@@ -2,7 +2,6 @@ package com.myproject.project_oop.dto.response.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myproject.project_oop.dto.response.AbstractDataResponse;
-import com.myproject.project_oop.model.File;
 import com.myproject.project_oop.model.User;
 import lombok.Data;
 import lombok.Getter;
@@ -45,12 +44,10 @@ public class UserDetailsResponse extends AbstractDataResponse {
     @JsonProperty("address")
     private String address;
 
-    @JsonProperty("avatarUrl")
-    private String avatarUrl;
+    @JsonProperty("avatarFileName")
+    private String avatarFileName;
 
     public static UserDetailsResponse buildFromUser(User user) {
-
-        File avatar = user.getAvatar();
 
         return UserDetailsResponse.builder()
                 .userId(user.getId())
@@ -63,7 +60,7 @@ public class UserDetailsResponse extends AbstractDataResponse {
                 .country(user.getCountry())
                 .city(user.getCountry())
                 .address(user.getAddress())
-                .avatarUrl(avatar == null ? null : avatar.getUrl())
+                .avatarFileName(user.getAvatarFileName())
                 .build();
     }
 

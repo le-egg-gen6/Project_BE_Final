@@ -33,7 +33,7 @@ public class UserController {
             @RequestBody UpdateUserRequest request
     ) {
         return ResponseEntity.ok(
-                BaseResponse.buildDataResponse(updateRegisteredUser(request))
+                BaseResponse.buildDataResponse(userService.updateUserDetails(request))
         );
     }
 

@@ -10,6 +10,7 @@ import com.myproject.project_oop.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ public class MessageServiceImpl implements MessageService {
                     .content(request.getContent())
                     .type(request.getType().equals("TEXT") ? MessageType.TEXT : MessageType.IMAGE)
                     .senderId(request.getSenderId())
+                    .createAt(new Date(System.currentTimeMillis()))
                     .build();
             return messageRepository.save(newMessage);
         } else {

@@ -113,25 +113,24 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public List<MessageResponse> getConversationMessage(Integer conversationId) {
-        var rawResponse = messageRepository.findByConversationIdOrderById(conversationId).stream()
-                .map(MessageResponse::buildFromMessage)
-                .toList();
+        var rawResponse = messageRepository.findByConversationIdOrderById(conversationId);
         List<MessageResponse> responses = new ArrayList<>();
-        if (rawResponse.size() == 1) {
-            responses.add(rawResponse.get(0));
-        } else if (rawResponse.size() > 1) {
+        if (!rawResponse.isEmpty()) {
+            responses.add(MessageResponse.buildFromMessage(rawResponse.get(0)));
+        }
+        if (rawResponse.size() > 1) {
             for (int i = 1; i < rawResponse.size(); ++i) {
                 var pre = rawResponse.get(i - 1);
                 var after = rawResponse.get(i);
-                if (checkDateDiff(pre.getCreatedAt(), after.getCreatedAt())) {
+                if (checkDateDiff(pre.getCreateAt(), after.getCreateAt())) {
                     responses.add(
                             MessageResponse.builder()
                                     .type("divider")
-                                    .content(convertDateToString(after.getCreatedAt()))
+                                    .content(convertDateToString(after.getCreateAt()))
                                     .build()
                     );
                 }
-                responses.add(after);
+                responses.add(MessageResponse.buildFromMessage(after));
             }
         }
         return responses;

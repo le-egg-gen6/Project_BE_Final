@@ -29,7 +29,7 @@ public class UpdateUserRequest {
     @JsonProperty("address")
     private String address;
 
-    @JsonProperty("avatarUrl")
-    private String avatarUrl;
+    @JsonProperty("avatarFileName")
+    private String avatarFileName;
 
 }

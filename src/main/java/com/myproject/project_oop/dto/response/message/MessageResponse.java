@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Data
 @Getter
 @Setter
@@ -31,7 +29,7 @@ public class MessageResponse {
     private Integer conversationId;
 
     @JsonProperty("createdAt")
-    private Date createdAt;
+    private String createdAt;
 
     @JsonProperty("content")
     private String content;
@@ -46,7 +44,12 @@ public class MessageResponse {
                 .type("msg")
                 .subtype(message.getType().name())
                 .conversationId(message.getConversation().getId())
-                .createdAt(message.getCreateAt())
+                .createdAt(String.valueOf(
+                        ((message.getCreateAt().getHours() < 10) ? "0" : "") + String.valueOf(message.getCreateAt().getHours())
+                                + ":"
+                                + ((message.getCreateAt().getMinutes() < 10) ? "0" : "") + String.valueOf(message.getCreateAt().getMinutes())
+                        )
+                )
                 .senderId(message.getSenderId())
                 .imageUrl(message.getImageUrl())
                 .build();

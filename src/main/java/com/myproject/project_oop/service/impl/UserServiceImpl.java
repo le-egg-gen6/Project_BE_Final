@@ -1,6 +1,5 @@
 package com.myproject.project_oop.service.impl;
 
-import com.myproject.project_oop.model.File;
 import com.myproject.project_oop.model.FriendRequest;
 import com.myproject.project_oop.model.Participant;
 import com.myproject.project_oop.model.User;
@@ -31,8 +30,6 @@ public class UserServiceImpl implements UserService {
     private final FriendRelationshipRepository friendRelationshipRepository;
 
     private final FriendRequestRepository friendRequestRepository;
-
-    private final FileService fileService;
 
     private final ParticipantService participantService;
 
@@ -88,12 +85,7 @@ public class UserServiceImpl implements UserService {
             user.setCountry(request.getCountry());
             user.setCity(request.getCity());
             user.setAddress(request.getAddress());
-            File new_avatar = File.builder()
-                    .url(request.getAvatarUrl())
-                    .type(FileType.AVATAR_IMAGE)
-                    .build();
-            var saved_new_avatar = fileService.save(new_avatar);
-            user.setAvatar(saved_new_avatar);
+            user.setAvatarFileName(request.getAvatarFileName());
             var saved_user = userRepository.save(user);
             return UserDetailsResponse.buildFromUser(saved_user);
         }

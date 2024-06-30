@@ -6,4 +6,6 @@ public enum MessageType {
 
     IMAGE,
 
+    LINK,
+
 }

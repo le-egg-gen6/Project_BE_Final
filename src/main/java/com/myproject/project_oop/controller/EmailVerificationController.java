@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 @Controller
 @RequestMapping("${api.prefix}" + "${api.version}" + "/email-verification")
 @RequiredArgsConstructor

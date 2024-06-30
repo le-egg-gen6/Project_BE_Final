@@ -41,9 +41,8 @@ public class User extends BaseModel{
     @Column(name = "about", columnDefinition = "TEXT")
     private String about;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "file_id", referencedColumnName = "id")
-    private File avatar;
+    @Column(name = "avatarFileName")
+    private String avatarFileName;
 
     @Column(name = "country")
     private String country;
